@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -59,6 +61,22 @@ class User implements UserInterface
      * @ORM\Column(type="date")
      */
     private $birthdate;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\UserSubscription", mappedBy="User", cascade={"persist", "remove"})
+     */
+    private $userSubscription;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Ride", mappedBy="User", orphanRemoval=true)
+     */
+    private $rides;
+
+    public function __construct()
+    {
+        $this->rides = new ArrayCollection();
+    }
+
 
 
 
@@ -179,6 +197,55 @@ class User implements UserInterface
 
         return $this;
     }
+
+    public function getUserSubscription(): ?UserSubscription
+    {
+        return $this->userSubscription;
+    }
+
+    public function setUserSubscription(UserSubscription $userSubscription): self
+    {
+        $this->userSubscription = $userSubscription;
+
+        // set the owning side of the relation if necessary
+        if ($userSubscription->getUser() !== $this) {
+            $userSubscription->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Ride[]
+     */
+    public function getRides(): Collection
+    {
+        return $this->rides;
+    }
+
+    public function addRide(Ride $ride): self
+    {
+        if (!$this->rides->contains($ride)) {
+            $this->rides[] = $ride;
+            $ride->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRide(Ride $ride): self
+    {
+        if ($this->rides->contains($ride)) {
+            $this->rides->removeElement($ride);
+            // set the owning side to null (unless already changed)
+            if ($ride->getUser() === $this) {
+                $ride->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
 
 
 

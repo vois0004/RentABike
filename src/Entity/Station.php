@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,6 +27,21 @@ class Station
      * @ORM\Column(type="integer")
      */
     private $capacity;
+
+    /**
+     * @ORM\Column(type="string", length=20)
+     */
+    private $state;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Bike", mappedBy="Station")
+     */
+    private $bikes;
+
+    public function __construct()
+    {
+        $this->bikes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -51,6 +68,49 @@ class Station
     public function setCapacity(int $capacity): self
     {
         $this->capacity = $capacity;
+
+        return $this;
+    }
+
+    public function getState(): ?string
+    {
+        return $this->state;
+    }
+
+    public function setState(string $state): self
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Bike[]
+     */
+    public function getBikes(): Collection
+    {
+        return $this->bikes;
+    }
+
+    public function addBike(Bike $bike): self
+    {
+        if (!$this->bikes->contains($bike)) {
+            $this->bikes[] = $bike;
+            $bike->setStation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBike(Bike $bike): self
+    {
+        if ($this->bikes->contains($bike)) {
+            $this->bikes->removeElement($bike);
+            // set the owning side to null (unless already changed)
+            if ($bike->getStation() === $this) {
+                $bike->setStation(null);
+            }
+        }
 
         return $this;
     }
