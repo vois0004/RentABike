@@ -29,20 +29,22 @@ class Ride
     private $User;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Station", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Station", inversedBy="rides")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $stationBegin;
+    private $StationBegin;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Station", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Station", inversedBy="rides")
      */
-    private $StationEnd;
+    private $stationEnd;
 
     /**
-     * @ORM\Column(type="time", nullable=true)
+     * @ORM\Column(type="datetime")
      */
-    private $Duration;
+    private $date;
+
+
 
     public function getId(): ?int
     {
@@ -75,37 +77,39 @@ class Ride
 
     public function getStationBegin(): ?Station
     {
-        return $this->stationBegin;
+        return $this->StationBegin;
     }
 
-    public function setStationBegin(Station $stationBegin): self
+    public function setStationBegin(?Station $StationBegin): self
     {
-        $this->stationBegin = $stationBegin;
+        $this->StationBegin = $StationBegin;
 
         return $this;
     }
 
     public function getStationEnd(): ?Station
     {
-        return $this->StationEnd;
+        return $this->stationEnd;
     }
 
-    public function setStationEnd(?Station $StationEnd): self
+    public function setStationEnd(?Station $stationEnd): self
     {
-        $this->StationEnd = $StationEnd;
+        $this->stationEnd = $stationEnd;
 
         return $this;
     }
 
-    public function getDuration(): ?\DateTimeInterface
+    public function getDate(): ?\DateTimeInterface
     {
-        return $this->Duration;
+        return $this->date;
     }
 
-    public function setDuration(?\DateTimeInterface $Duration): self
+    public function setDate(\DateTimeInterface $date): self
     {
-        $this->Duration = $Duration;
+        $this->date = $date;
 
         return $this;
     }
+
+
 }
