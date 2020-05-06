@@ -9,6 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Subscription
 {
+
+    const OCCASIONNAL = 'occasionnal',
+        MEDIUM = 'medium',
+        REGULAR = 'regular';
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

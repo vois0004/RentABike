@@ -14,6 +14,7 @@ class RideVoter extends Voter
     const NEW = 'new';
     const RETURN = 'return';
     private $rideRepository;
+    private $stationRepository;
 
     public function __construct(RideRepository $rideRepository, StationRepository $stationRepository)
     {

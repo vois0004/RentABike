@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Bike;
 use App\Entity\Ride;
 use App\Entity\Station;
 use App\Entity\Subscription;

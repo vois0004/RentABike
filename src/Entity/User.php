@@ -72,6 +72,11 @@ class User implements UserInterface
      */
     private $rides;
 
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $stripeCustomer;
+
     public function __construct()
     {
         $this->rides = new ArrayCollection();
@@ -242,6 +247,18 @@ class User implements UserInterface
                 $ride->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStripeCustomer(): ?string
+    {
+        return $this->stripeCustomer;
+    }
+
+    public function setStripeCustomer(?string $stripeCustomer): self
+    {
+        $this->stripeCustomer = $stripeCustomer;
 
         return $this;
     }

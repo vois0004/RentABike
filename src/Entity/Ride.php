@@ -35,7 +35,7 @@ class Ride
     private $StationBegin;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Station", inversedBy="rides")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Station", inversedBy="ridesEnd")
      */
     private $stationEnd;
 
@@ -44,7 +44,11 @@ class Ride
      */
     private $date;
 
-
+    /**
+     * @ORM\OneToOne(targetEntity="Payment", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=false, referencedColumnName="id")
+     */
+    private $payment;
 
     public function getId(): ?int
     {
@@ -110,6 +114,20 @@ class Ride
 
         return $this;
     }
+
+    public function getPayment(): ?Payment
+    {
+        return $this->payment;
+    }
+
+    public function setPayment(Payment $payment): self
+    {
+        $this->payment = $payment;
+
+        return $this;
+    }
+
+
 
 
 }
