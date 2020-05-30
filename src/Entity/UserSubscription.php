@@ -22,11 +22,6 @@ class UserSubscription
     private $dateBeginning;
 
     /**
-     * @ORM\Column(type="date")
-     */
-    private $DateEnd;
-
-    /**
      * @ORM\OneToOne(targetEntity="App\Entity\User", inversedBy="userSubscription", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
@@ -37,6 +32,11 @@ class UserSubscription
      * @ORM\JoinColumn(nullable=false)
      */
     private $Subscription;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $stripeSubscription;
 
     public function getId(): ?int
     {
@@ -55,17 +55,7 @@ class UserSubscription
         return $this;
     }
 
-    public function getDateEnd(): ?\DateTimeInterface
-    {
-        return $this->DateEnd;
-    }
 
-    public function setDateEnd(\DateTimeInterface $DateEnd): self
-    {
-        $this->DateEnd = $DateEnd;
-
-        return $this;
-    }
 
     public function getUser(): ?User
     {
@@ -87,6 +77,18 @@ class UserSubscription
     public function setSubscription(?Subscription $Subscription): self
     {
         $this->Subscription = $Subscription;
+
+        return $this;
+    }
+
+    public function getStripeSubscription(): ?string
+    {
+        return $this->stripeSubscription;
+    }
+
+    public function setStripeSubscription(string $stripeSubscription): self
+    {
+        $this->stripeSubscription = $stripeSubscription;
 
         return $this;
     }

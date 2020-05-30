@@ -10,6 +10,7 @@ import '../css/app.scss';
 
 
 const $ = require('jquery');
+window.$ = $;
 // this "modifies" the jquery module: adding behavior to it
 // the bootstrap module doesn't export/return anything
 require('bootstrap');
@@ -21,3 +22,5 @@ require('bootstrap');
 $(document).ready(function() {
     $('[data-toggle="popover"]').popover();
 });
+
+import '@fortawesome/fontawesome-free/css/all.css';

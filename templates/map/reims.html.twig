@@ -7,7 +7,8 @@
           crossorigin=""/>
     <style type="text/css">
         #map { /* la carte DOIT avoir une hauteur sinon elle n'apparaît pas */
-            height: 800px;
+            height: 600px;
+            width:600px;
         }
     </style>
 {% endblock %}
@@ -16,6 +17,7 @@
 {% endblock %}
 
 {% block body %}
+
     <div id="map">
         <!-- Ici s'affichera la carte -->
     </div>
@@ -32,31 +34,58 @@
         var lon = 4.033;
         var macarte = null;
 
-        // Fonction d'initialisation de la carte
-        // Nous initialisons une liste de marqueurs
-        var villes = {
-            "Paris": {"lat": 48.852969, "lon": 2.349903},
-            "Brest": {"lat": 48.383, "lon": -4.500},
-            "Quimper": {"lat": 48.000, "lon": -4.100},
-            "Bayonne": {"lat": 43.500, "lon": -1.467}
-        };
 
         // Fonction d'initialisation de la carte
         function initMap() {
             // Créer l'objet "macarte" et l'insèrer dans l'élément HTML qui a l'ID "map"
-            macarte = L.map('map').setView([lat, lon], 11);
+            macarte = L.map('map').setView([lat, lon], 10);
+
+            var southWest = L.latLng(49.235966602551215, 3.9849018126641855),
+                northEast = L.latLng(49.28195626885696, 4.096275722413276),
+                mybounds = L.latLngBounds(southWest, northEast);
+
+
             // Leaflet ne récupère pas les cartes (tiles) sur un serveur par défaut. Nous devons lui préciser où nous souhaitons les récupérer. Ici, openstreetmap.fr
             L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
                 // Il est toujours bien de laisser le lien vers la source des données
                 attribution: 'données © OpenStreetMap/ODbL - rendu OSM France',
-                minZoom: 1,
-                maxZoom: 20
+                bounds: mybounds,
+                minZoom: 14,
+                maxZoom: 16
             }).addTo(macarte);
             // Nous parcourons la liste des villes
+            macarte.setMaxBounds(macarte.getBounds());
+
+
+            var Icon = L.Icon.extend({
+                options: {
+                    iconSize:     [24, 38],
+                    iconAnchor:   [22, 94],
+                    popupAnchor:  [-3, -76]
+                }
+            });
+            var greenIcon = new Icon({iconUrl: '{{ asset('build/green.png') }}' }),
+                redIcon = new Icon({iconUrl: '{{ asset('build/red.png') }}' }),
+                orangeIcon = new Icon({iconUrl: '{{ asset('build/orange.png') }}'}),
+                blueIcon = new Icon({iconUrl: '{{ asset('build/blue.png') }}'});
+
 
             {% for station in stations %}
-            var marker = L.marker([{{ station.latitude }}, {{ station.longitude }}]).addTo(macarte);
-            marker.bindPopup("<div><h1>{{ station.adresse }}</h1></div><div>Vélos disponibles : {{ station.disponibility }}/{{ station.capacity }}</div><div><a href='http://127.0.0.1:8000/start_ride/{{ station.id }}'>Louer un vélo</a></div>");
+            var marker;
+            if({{ user.favStation.id }}=={{ station.id }}){
+                marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], { icon : blueIcon }).addTo(macarte);
+            }
+            else{
+                switch({{ station.state }}){
+                    case open:  marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], { icon : greenIcon }).addTo(macarte);
+                        break;
+                    case close :  marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], { icon : redIcon }).addTo(macarte);
+                    break;
+                    case 'under_work' : marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], { icon : orangeIcon }).addTo(macarte);
+                }
+
+            }
+            marker.bindPopup("<div><h1>{{ station.adresse }}</h1></div> <div>Vélos disponibles : {{ station.disponibility }}/{{ station.capacity }}</div><div><a href=\"{{ url('app_start_ride', { 'id_station': station.id }) }}\">Louer un vélo</a> <a href=\"{{ url('app_add_fav', { 'id_station': station.id }) }}\"> <i class=\"far fa-star favori\"></i></a></div>");
             {% endfor %}
 
         }
@@ -65,5 +94,6 @@
             // Fonction d'initialisation qui s'exécute lorsque le DOM est chargé
             initMap();
         };
+
     </script>
 {% endblock %}

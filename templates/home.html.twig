@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+
+            <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Bonjour {{ user.firstname }} {{ user.lastname }} </h5>
+                {% if ride is null  %}
+                <p class="card-text">
+                <p>Vous n'avez pas de trajet en cours. </p>
+                <a href="{{ path('app_map') }}" class="card-link">Cliquez ici pour voir la carte</a>
+                    {% if user.favstation != null %}
+                        <a href="{{ url('app_start_ride', { 'id_station': user.favstation.id }) }}" class="card-link">Cliquez ici pour accèder à votre station favorite</a>
+                        </p>
+                    {% endif %}
+                {% else %}
+                    <p class="card-text">
+                    <p>Vous avez un trajet en cours. {{ ride.id }}</p>
+                    <a href="{{ path('app_return_bike') }}" class="card-link">Cliquez ici pour y accèder</a>
+                    </p>
+
+                {% endif %}
+            </div>
+            </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Abonnement</h5>
+                        {% if userSubscription == null %}
+                            <p class="card-text">
+                            <p>Vous ne bénéficiez pas d'un abonnement. </p>
+                            <a href="{{ path('app_user_subscription') }}" class="card-link">Cliquez ici pour souscrire un abonnement</a>
+                            </p>
+                        {% else %}
+                            <p class="card-text">Vous bénéficiez d'un abonnement {{ userSubscription.type }} pour {{ userSubscription.price }}€/mois.
+                                Il vous reste aujourd'hui {{ timeFree }}</p>
+                            <a href="{{ path('app_update_user_subscription') }}" class="card-link">Cliquez ici pour changer d'abonnement</a>
+                            <a href="#" class="card-link">Cliquez ici pour arrêter l'abonnement</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Trajets</h5>
+                        <p class="card-text">Cette semaine, vous avez loué un vélo pendant un total de {{ timeSpend }} minutes.</p>
+                        <a href="{{ path('app_list_ride') }}" class="card-link">Voir les trajets</a>
+                    </div>
+                </div>
+
+{% endblock %}

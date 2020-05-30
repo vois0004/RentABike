@@ -30,10 +30,12 @@ class Subscription
      */
     private $price;
 
+
     /**
      * @ORM\Column(type="integer")
      */
-    private $duration;
+    private $freeTime;
+
 
     public function getId(): ?int
     {
@@ -64,20 +66,24 @@ class Subscription
         return $this;
     }
 
-    public function getDuration(): ?int
-    {
-        return $this->duration;
-    }
 
-    public function setDuration(int $duration): self
-    {
-        $this->duration = $duration;
-
-        return $this;
-    }
 
     public function __construct()
     {
 
     }
+
+    public function getFreeTime(): ?int
+    {
+        return $this->freeTime;
+    }
+
+    public function setFreeTime(int $freeTime): self
+    {
+        $this->freeTime = $freeTime;
+
+        return $this;
+    }
+
+
 }

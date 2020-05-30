@@ -50,6 +50,12 @@ class Ride
      */
     private $payment;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $dateEnd;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -127,7 +133,17 @@ class Ride
         return $this;
     }
 
+    public function getDateEnd(): ?\DateTimeInterface
+    {
+        return $this->dateEnd;
+    }
 
+    public function setDateEnd(?\DateTimeInterface $dateEnd): self
+    {
+        $this->dateEnd = $dateEnd;
+
+        return $this;
+    }
 
 
 }

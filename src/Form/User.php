@@ -26,8 +26,7 @@ class UserType extends AbstractType
             ->add('birthdate', DateType::class)
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false
-            ])
-            ->add('save', SubmitType::class);
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)

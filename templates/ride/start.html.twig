@@ -12,7 +12,8 @@
     <!-- We'll put the error messages in this element -->
     <div id="card-errors" role="alert"></div>
     {{ form_row(form.bike) }}
-        <button type="submit" id="start_ride_submit">Save</button>
+
+        <button type="submit" class="btn btn-primary" id="start_ride_submit">Save</button>
     {{ form_end(form) }}
 {% endblock %}
 {% block javascripts %}

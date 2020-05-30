@@ -22,8 +22,7 @@ class ReturnBikeType extends AbstractType
             ->add('stationEnd', EntityType::class, [
                 'class'=>Station::class,
                 'choice_label'=>'adresse',
-            ])
-            ->add('save', SubmitType::class);;
+            ]);
         ;
     }
 

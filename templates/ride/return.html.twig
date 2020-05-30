@@ -1,8 +1,14 @@
 {% extends 'base.html.twig' %}
 {% block body %}
     <h1><time></time></h1>
+    {{ form_start(form, {'attr': {'id': form.vars.id}}) }}
+    {{ form_row(form.stationEnd) }}
 
-    {{ form(form) }}
+    <button class="btn btn-primary" type="submit">Submit</button>
+    {{ form_end(form) }}
+
+
+
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}

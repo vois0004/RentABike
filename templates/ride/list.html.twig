@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+
+            <th scope="col">Station de départ</th>
+            <th scope="col">Station d'arrivée</th>
+            <th scope="col">Date</th>
+            <th scope="col">Durée</th>
+            <th scope="col">Prix</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for ride in rides %}
+        <tr>
+            <td>{{ride.stationBegin.adresse}}</td>
+            <td>{% if ride.stationEnd is not null%}{{ride.stationEnd.adresse}}{% endif %}</td>
+            <td>{{ride.date|date()}}</td>
+            <td> {% if ride.stationEnd is not null%}{{ date(ride.dateEnd).diff(date(ride.date)).i }} minutes {% endif %} </td>
+            <td>{% if ride.payment is not null%}{{ride.payment.amount}}{% endif %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

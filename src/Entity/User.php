@@ -77,6 +77,11 @@ class User implements UserInterface
      */
     private $stripeCustomer;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Station")
+     */
+    private $favStation;
+
     public function __construct()
     {
         $this->rides = new ArrayCollection();
@@ -259,6 +264,18 @@ class User implements UserInterface
     public function setStripeCustomer(?string $stripeCustomer): self
     {
         $this->stripeCustomer = $stripeCustomer;
+
+        return $this;
+    }
+
+    public function getFavStation(): ?Station
+    {
+        return $this->favStation;
+    }
+
+    public function setFavStation(?Station $favStation): self
+    {
+        $this->favStation = $favStation;
 
         return $this;
     }

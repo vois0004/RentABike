@@ -11,7 +11,8 @@ class Payment
 {
 
     const IN_PROGRESS ='in progress',
-        DONE = 'done';
+        DONE = 'done',
+        DONE_FREE = 'done_free';
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

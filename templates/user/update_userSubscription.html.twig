@@ -14,12 +14,12 @@
     </div>
     <div id="card-errors" role="alert"></div>
     {{ form_row(form.subscription) }}
-    <button type="submit" id="userSubscription_submit" class="btn btn-primary">Save</button>
+    <button type="submit" id="userSubscriptionUpdate_submit" class="btn btn-primary">Save</button>
     {{ form_end(form) }}
 {% endblock %}
 
 {% block javascripts %}
-{{ parent() }}
+    {{ parent() }}
     <script>
         var stripe = Stripe('pk_test_q8v7x6uaNmt8mRH4yG8bxVfs005I9JX2kE');
         var elements = stripe.elements();
@@ -53,7 +53,7 @@
         });
 
 
-        var buttonSave = document.getElementById('userSubscription_submit');
+        var buttonSave = document.getElementById('userSubscriptionUpdate_submit');
 
         buttonSave.addEventListener('click', function(e) {
             // We don't want to let default form submission happen here,

@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Bike;
 use App\Entity\Payment;
 use App\Entity\Station;
+use App\Entity\Subscription;
+use App\Entity\User;
 use App\Form\ReturnBikeType;
 use App\Form\RideType;
 use App\Entity\Ride;
@@ -48,6 +50,9 @@ class RideController extends AbstractController
             return $this->redirectToRoute('app_return_bike');
         }
 
+        if($station->getState()!='open'){
+            throw new \Exception("Station non ouverte");
+        }
         $ride->setStationBegin($station);
 
         $form = $this->createForm(RideType::class, $ride);
@@ -118,6 +123,7 @@ class RideController extends AbstractController
         ]);
     }
 
+
     /**
      * @Route("/return_ride", name="app_return_bike")
      * @param Request $request
@@ -126,8 +132,8 @@ class RideController extends AbstractController
      */
     public function return(Request $request)
     {
-        // creates a user object and initializes some data for this example
-        $ride =  $this->getDoctrine()->getRepository(Ride::class)->findOneBy(['User'=>$this->getUser(),'stationEnd'=>null]);
+        $rideRepository = $this->getDoctrine()->getRepository(Ride::class);
+        $ride =  $rideRepository->findOneBy(['User'=>$this->getUser(), 'stationEnd'=>null]);
 
         try{
             $this->denyAccessUnlessGranted('return', $ride);
@@ -143,22 +149,62 @@ class RideController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $ride=$form->getData();
+
+            if($ride->getStationEnd()->getState()!='open'){
+                throw new \Exception("Station non ouverte");
+            }
+
+            //Get the client's subscription if he has one
+            /** @var Subscription $subscriptionType */
+            $subscriptionType;
+            $timeFree =0;
+
+            if($subscriptionType = $this->getUser()->getUserSubscription()!=null) {
+                $subscriptionType = $this->getUser()->getUserSubscription()->getSubscription();
+            }
+
+            //Get the duration or the ride
             $date=new DateTime();
             $since_start=$date->diff($ride->getDate());
             $minutes = $since_start->days * 24 * 60 + $since_start->h * 60 + $since_start->i;
             //*100 pour test
-            $price = $minutes*1.5*100;
+
+            //Get the free time left for today
+            if($subscriptionType!=null) {
+                $timeFree = $subscriptionType->getFreeTime();
+                $rides = $rideRepository->findByUserAndToday($this->getUser());
+                /** @var Ride $r */
+                foreach ($rides as $r) {
+                    $timeFree -= $r->getDateEnd()->diff($r->getDate())->i;
+                }
+            }
+            //Calculate price according to the duration of the ride substract the timefree
+            //if timeFree < 0, no timefree left
+            //if minutes - timesfree < 0, the ride is free
+            $price = ($minutes - ($timeFree > 0 ? $timeFree : 0) > 0 ? $minutes : 0) * 1 *100;
 
             Stripe::setApiKey('sk_test_0V6MS5gcKG7l3dmk7htPzLLs00CBLB0DQH');
 
-            $intent = PaymentIntent::retrieve($ride->getPayment()->getIdPayment());
-            $intent->capture(['amount_to_capture' => $price]);
 
-            $ride=$form->getData();
+            $intent = PaymentIntent::retrieve($ride->getPayment()->getIdPayment());
+
+            if($price>0){
+                $intent->capture(['amount_to_capture' => $price]);
+            }
+            else {
+                $intent->cancel();
+            }
+
+            $payment=$ride->getPayment();
+            $payment->setStatus(Payment::DONE_FREE);
+            $payment->setAmount($price);
+            $payment->setDatePayment($date);
+            $ride->setDateEnd(new DateTime());
 
             $bike = $ride->getBike();
             $bike->setStation($ride->getStationEnd());
-
+            //check if the stationEnd is not full
             $station = $bike->getStation();
             $stationFull = ($station->getCapacity()==$station->getDisponibility())?true:false;
             if($stationFull){
@@ -166,10 +212,6 @@ class RideController extends AbstractController
             }
             $station->setDisponibility($station->getDisponibility()+1);
 
-            $payment=$ride->getPayment();
-            $payment->setStatus(Payment::DONE);
-            $payment->setAmount($price);
-            $payment->setDatePayment($date);
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($ride);
@@ -180,6 +222,23 @@ class RideController extends AbstractController
         return $this->render('ride/return.html.twig', [
             'form' => $form->createView(),
             'dateBegin' => $dateBegin
+        ]);
+    }
+
+
+    /**
+     * @Route("/list_ride", name="app_list_ride")
+     * @param Request $request
+     * @return RedirectResponse|Response
+     * @throws ApiErrorException
+     */
+    public function show(Request $request)
+    {
+        $rideRepository = $this->getDoctrine()->getRepository(Ride::class);
+        $rides =  $rideRepository->findAllByUser($this->getUser());
+
+        return $this->render('ride/list.html.twig', [
+            'rides'=>$rides
         ]);
     }
 

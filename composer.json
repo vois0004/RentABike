@@ -5,6 +5,7 @@
         "php": "^7.2.5",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "beberlei/doctrineextensions": "^1.2",
         "endroid/qr-code-bundle": "^3.4",
         "sensio/framework-extra-bundle": "^5.5",
         "stripe/stripe-php": "^7.31",

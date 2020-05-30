@@ -1,1 +1,25 @@
+$theme-colors: (
+        "primary": #60d394
+);
+
 @import "~bootstrap/scss/bootstrap";
+
+
+main {
+  margin: auto;
+  padding: 25px;
+  width : 70%;
+  height : 100%;
+}
+
+
+th{
+  padding : 0px;
+}
+
+
+.card{
+  width: 50%;
+  margin : 15px auto 0 auto;
+  background-color : #dcf9f1;
+}

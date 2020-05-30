@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Ride;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -22,19 +23,48 @@ class RideRepository extends ServiceEntityRepository
     // /**
     //  * @return Ride[] Returns an array of Ride objects
     //  */
-    /*
-    public function findByExampleField($value)
+
+    public function findByUserAndToday(User $user)
     {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('r.id', 'ASC')
-            ->setMaxResults(10)
+        $qb =  $this->createQueryBuilder('r')
+            ->where('YEAR(r.date) = YEAR(:datecourant)')
+            ->andWhere('MONTH(r.date) = MONTH(:datecourant)')
+            ->andWhere('DAY(r.date) = DAY(:datecourant)')
+            ->andWhere('r.stationEnd is not null')
+            ->andWhere('r.User = '.$user->getId())
+            ->setParameter('datecourant', new \Datetime());
+        return $qb
             ->getQuery()
             ->getResult()
-        ;
+            ;
     }
-    */
+
+    public function findByUserAndThisWeek(User $user)
+    {
+
+        $qb =  $this->createQueryBuilder('r')
+            ->where('YEAR(r.date) = YEAR(:datecourant)')
+            ->andWhere('MONTH(r.date) = MONTH(:datecourant)')
+            ->andWhere('WEEK(r.date) = WEEK(:datecourant)')
+            ->andWhere('r.stationEnd is not null')
+            ->andWhere('r.User = '.$user->getId())
+            ->setParameter('datecourant', new \Datetime());
+        return $qb
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+    public function findAllByUser(User $user)
+    {
+
+        $qb =  $this->createQueryBuilder('r')
+            ->where('r.User = '.$user->getId());
+        return $qb
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 
     /*
     public function findOneBySomeField($value): ?Ride

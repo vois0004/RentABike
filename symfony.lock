@@ -2,6 +2,9 @@
     "bacon/bacon-qr-code": {
         "version": "2.0.0"
     },
+    "beberlei/doctrineextensions": {
+        "version": "v1.2.6"
+    },
     "dasprid/enum": {
         "version": "1.0.0"
     },
@@ -542,7 +545,7 @@
             "./config/packages/test/webpack_encore.yaml",
             "./config/packages/webpack_encore.yaml",
             "./package.json",
-            "./webpack.config.js"
+            "./nfig.js"
         ]
     },
     "symfony/yaml": {
