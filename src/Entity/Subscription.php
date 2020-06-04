@@ -36,6 +36,11 @@ class Subscription
      */
     private $freeTime;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $stripePlan;
+
 
     public function getId(): ?int
     {
@@ -81,6 +86,18 @@ class Subscription
     public function setFreeTime(int $freeTime): self
     {
         $this->freeTime = $freeTime;
+
+        return $this;
+    }
+
+    public function getStripePlan(): ?string
+    {
+        return $this->stripePlan;
+    }
+
+    public function setStripePlan(?string $stripePlan): self
+    {
+        $this->stripePlan = $stripePlan;
 
         return $this;
     }

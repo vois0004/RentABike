@@ -1,16 +1,20 @@
 {% extends 'base.html.twig' %}
 {% block stylesheets %}
     {{ parent() }}
-    <title>Checkout</title>
     <script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+{% block title %}
+    Louer un vélo
 {% endblock %}
 {% block body %}
     {{ form_start(form, {'attr': {'id': form.vars.id}}) }}
-    <div id="card-element">
-        <!-- Elements will create input elements here -->
-    </div>
-    <!-- We'll put the error messages in this element -->
-    <div id="card-errors" role="alert"></div>
+
+        <div id="card-element">
+            <!-- Elements will create input elements here -->
+        </div>
+        <!-- We'll put the error messages in this element -->
+        <div id="card-errors" role="alert"></div>
+
     {{ form_row(form.bike) }}
 
         <button type="submit" class="btn btn-primary" id="start_ride_submit">Save</button>
@@ -19,7 +23,6 @@
 {% block javascripts %}
 {{ parent() }}
     <script>
-
         var stripe = Stripe('pk_test_q8v7x6uaNmt8mRH4yG8bxVfs005I9JX2kE');
         var elements = stripe.elements();
 
@@ -40,7 +43,7 @@
                 payment_method: {
                     card: card,
                     billing_details: {
-                        name: 'Jenny Rosen'
+                        name: "{{ app.user.lastname }}"
                     }
                 }
             }).then(function(result) {
@@ -56,5 +59,6 @@
                 }
             });
         });
+
     </script>
 {% endblock %}

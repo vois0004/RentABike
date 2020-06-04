@@ -50,9 +50,14 @@ class RideController extends AbstractController
             return $this->redirectToRoute('app_return_bike');
         }
 
-        if($station->getState()!='open'){
-            throw new \Exception("Station non ouverte");
+        if($station->getState()!=Station::open){
+            $this->addFlash(
+                'notice',
+                'Station non ouverte'
+            );
+            return $this->redirectToRoute('app_map');
         }
+
         $ride->setStationBegin($station);
 
         $form = $this->createForm(RideType::class, $ride);
@@ -69,12 +74,20 @@ class RideController extends AbstractController
             'capture_method' => 'manual',
         ]);
 
+        //Get the client's subscription if he has one
+        /** @var \Stripe\Subscription $subscription */
 
+        if($this->getUser()->getUserSubscription()!=null) {
+            $subscription = \Stripe\Subscription::retrieve(
+                $this->getUser()->getUserSubscription()->getStripeSubscription(),
+                []
+            );
+        }
+        else {
+            $subscription = null;
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-
-
             try {
                 if ($form->get("paiementId")->getData() != null) {
                     $intent = \Stripe\PaymentIntent::retrieve(
@@ -119,6 +132,7 @@ class RideController extends AbstractController
 
         return $this->render('ride/start.html.twig', [
             'form' => $form->createView(),
+            'subscription'=>$subscription,
             'intent'=>$intent
         ]);
     }
@@ -151,16 +165,20 @@ class RideController extends AbstractController
 
             $ride=$form->getData();
 
-            if($ride->getStationEnd()->getState()!='open'){
-                throw new \Exception("Station non ouverte");
+            if($ride->getStationEnd()->getState()!=Station::open){
+                $this->addFlash(
+                    'notice',
+                    'Station non ouverte'
+                );
+                return $this->redirectToRoute('app_map');
             }
 
             //Get the client's subscription if he has one
             /** @var Subscription $subscriptionType */
-            $subscriptionType;
+            $subscriptionType = null;
             $timeFree =0;
 
-            if($subscriptionType = $this->getUser()->getUserSubscription()!=null) {
+            if($this->getUser()->getUserSubscription()!=null) {
                 $subscriptionType = $this->getUser()->getUserSubscription()->getSubscription();
             }
 

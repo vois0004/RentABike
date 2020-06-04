@@ -1,9 +1,12 @@
 {% extends 'base.html.twig' %}
+{% block title %}
+    Abonnement
+{% endblock %}
 {% block body %}
 Abonnement confirmé !
 
 
-    <button type="button" class="btn btn-primary">Terminé</button>
+    <button type="button" onclick="location.href='{{ path('app_home') }}'" class="btn btn-primary">Terminé</button>
 
 {% endblock %}
 {% block javascripts %}

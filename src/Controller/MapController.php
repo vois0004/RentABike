@@ -2,6 +2,7 @@
 // src/Controller/LuckyController.php
 namespace App\Controller;
 
+use App\Entity\Ride;
 use App\Entity\Station;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,10 +18,13 @@ class MapController extends AbstractController
     {
 
         $stations = $this->getDoctrine()->getRepository(Station::class)->findAll();
+        $rideRepository = $this->getDoctrine()->getRepository(Ride::class);
+        $ride =  $rideRepository->findOneBy(['User'=>$this->getUser(), 'stationEnd'=>null]);
 
         return $this->render('map/reims.html.twig', [
            'stations'=>$stations,
-            'user'=>$this->getUser()
+            'user'=>$this->getUser(),
+            'ride' => $ride
         ]);
     }
 
@@ -43,8 +47,8 @@ class MapController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
-        if($oldStation!=null){
+
             return $this->redirectToRoute('app_map');
-        }
+
     }
 }

@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Station
 {
+    const open = "OPEN", close ="CLOSE", work_in_progress = "WORK_IN_PROGRESS";
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

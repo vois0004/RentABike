@@ -30,6 +30,7 @@ class UserSubscriptionController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $userSubscription = $form->getData();
 
             Stripe::setApiKey('sk_test_0V6MS5gcKG7l3dmk7htPzLLs00CBLB0DQH');
 
@@ -39,44 +40,31 @@ class UserSubscriptionController extends AbstractController
               }
 
               catch (\Exception $e){
+
             $customer = Customer::create([
                 'payment_method' => $form->get("paiementId")->getData(),
-                'email' => 'jenny.rosen@example.com',
+                'email' => $this->getUser()->getEmail(),
                 'invoice_settings' => [
                     'default_payment_method' => $form->get("paiementId")->getData()
                 ]
             ]);
         }
 
-        /*
 
-            $subscription = Subscription::create([
+            $subscription = \Stripe\Subscription::create([
                 'customer' => $customer->id,
                 'items' => [
                     [
-                        'plan' => 'plan_HEck5rxUUiMZmz',
+                        'price' => $userSubscription->getSubscription()->getStripePlan(),
                     ],
                 ],
                 'expand' => ['latest_invoice.payment_intent'],
             ]);
-*/
 
-            $subscription = \Stripe\Subscription::create([
-                'customer' => $customer->id,
-                'items' => [[
-                    'price_data' => [
-                        'unit_amount' => 5000,
-                        'currency' => 'eur',
-                        'product' => 'prod_HEePRWghaGX95d',
-                        'recurring' => [
-                            'interval' => 'month',
-                        ],
-                    ],
-                ]],
-            ]);
+
 
             $this->getUser()->setStripeCustomer($customer->id);
-            $userSubscription = $form->getData();
+
             $userSubscription->setDateBeginning(new \DateTime());
             $userSubscription->setUser($this->getUser());
             $userSubscription->setStripeSubscription($subscription->id);
@@ -124,25 +112,26 @@ class UserSubscriptionController extends AbstractController
         \Stripe\Stripe::setApiKey('sk_test_0V6MS5gcKG7l3dmk7htPzLLs00CBLB0DQH');
 
         $userSubscription = $this->getUser()->getUserSubscription();
-        $subscription = $userSubscription->getStripeSubscription();
-        $subscription = \Stripe\Subscription::retrieve($subscription);
-        
+
         $form = $this->createForm(UserSubscriptionType::class, $userSubscription);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UserSubscription $userSubscription */
+            $userSubscription = $form->getData();
+
+            $subscription = \Stripe\Subscription::retrieve($userSubscription->getStripeSubscription());
+
             \Stripe\Subscription::update($subscription->id, [
                 'cancel_at_period_end' => false,
                 'proration_behavior' => 'create_prorations',
                 'items' => [
                     [
                         'id' => $subscription->items->data[0]->id,
-                        'price' => 'price_CBb6IXqvTLXp3f',
+                        'price' => $subscription->price,
                     ],
                 ],
             ]);
-            $subscription = \Stripe\Subscription::retrieve($subscription);
-            var_dump($subscription->toArray());die;
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($userSubscription);
@@ -153,6 +142,35 @@ class UserSubscriptionController extends AbstractController
 
         return $this->render('user/update_userSubscription.html.twig', [
             'form' => $form->createView(),
+        ]);
+
+    }
+    /**
+     * @Route("/cancel_user_subscription", name="app_cancel_user_subscription")
+     * @param Request $request
+     * @return RedirectResponse|Response
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    public function cancel(Request $request)
+    {
+        \Stripe\Stripe::setApiKey('sk_test_0V6MS5gcKG7l3dmk7htPzLLs00CBLB0DQH');
+
+        $userSubscription = $this->getUser()->getUserSubscription();
+
+
+        if ($request->getMethod() == Request::METHOD_POST) {
+            $subscription = \Stripe\Subscription::retrieve($userSubscription->getStripeSubscription());
+            $subscription->cancel();
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($userSubscription);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_home');
+        }
+
+        return $this->render('user/cancel_userSubscription.html.twig', [
+            'subscription'=>$userSubscription
         ]);
 
     }

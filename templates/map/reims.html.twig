@@ -8,7 +8,6 @@
     <style type="text/css">
         #map { /* la carte DOIT avoir une hauteur sinon elle n'apparaît pas */
             height: 600px;
-            width:600px;
         }
     </style>
 {% endblock %}
@@ -17,6 +16,7 @@
 {% endblock %}
 
 {% block body %}
+            <h1 class="display-4" >Carte de Reims</h1>
 
     <div id="map">
         <!-- Ici s'affichera la carte -->
@@ -34,6 +34,9 @@
         var lon = 4.033;
         var macarte = null;
 
+        function redirectTo(path){
+            location.href =path;
+        }
 
         // Fonction d'initialisation de la carte
         function initMap() {
@@ -72,20 +75,76 @@
 
             {% for station in stations %}
             var marker;
-            if({{ user.favStation.id }}=={{ station.id }}){
-                marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], { icon : blueIcon }).addTo(macarte);
-            }
-            else{
-                switch({{ station.state }}){
-                    case open:  marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], { icon : greenIcon }).addTo(macarte);
-                        break;
-                    case close :  marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], { icon : redIcon }).addTo(macarte);
-                    break;
-                    case 'under_work' : marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], { icon : orangeIcon }).addTo(macarte);
-                }
 
-            }
-            marker.bindPopup("<div><h1>{{ station.adresse }}</h1></div> <div>Vélos disponibles : {{ station.disponibility }}/{{ station.capacity }}</div><div><a href=\"{{ url('app_start_ride', { 'id_station': station.id }) }}\">Louer un vélo</a> <a href=\"{{ url('app_add_fav', { 'id_station': station.id }) }}\"> <i class=\"far fa-star favori\"></i></a></div>");
+            {% if user.favStation is not null and user.favStation.id == station.id %}
+                marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], { icon : blueIcon }).addTo(macarte);
+            {% else %}
+                switch("{{ station.state }}"){
+                    case 'OPEN':  marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], { icon : greenIcon }).addTo(macarte);
+                        break;
+                    case 'CLOSE' :  marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], { icon : redIcon }).addTo(macarte);
+                    break;
+                    case 'WORK_IN_PROGRESS' : marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], { icon : orangeIcon }).addTo(macarte);
+                }
+            {% endif %}
+
+           var popup = document.createElement('div');
+           popup.setAttribute('class', 'card');
+           popup.style.width = '18rem';
+           popup.style.backgroundColor = '#fff0';
+
+            var cardBody = document.createElement('div');
+            cardBody.setAttribute('class','card-body');
+            var title = document.createElement('h5');
+            title.textContent = "{{ station.adresse }}";
+            title.setAttribute('class', 'card-title' );
+            cardBody.appendChild(title);
+
+
+            var disponibility = document.createElement('h6');
+            disponibility.textContent = "Vélos disponibles : {{ station.disponibility }}/{{ station.capacity }}";
+            disponibility.setAttribute('class', 'card-subtitle mb-2 text-muted' );
+            cardBody.appendChild(disponibility);
+            var buttons = document.createElement('div');
+            buttons.setAttribute('class', 'btn-group btn-group-sm');
+            buttons.setAttribute('role','group');
+
+            {% if station.state == 'OPEN' %}
+
+
+            var rent = document.createElement("button");
+            rent.type = 'button';
+            rent.setAttribute('class', 'btn btn-secondary');
+            {% if ride is null %}
+            console.log("hey");
+            rent.onclick = function() {(redirectTo("{{ url('app_start_ride', { 'id_station': station.id }) }}"))};
+            rent.textContent = "Louer un vélo";
+            {% else %}
+            console.log("hi");
+            rent.onclick = function() {(redirectTo("{{ url('app_return_bike', { 'id_station': station.id }) }}"))};
+            rent.textContent = "Rendre un vélo";
+            {% endif %}
+            buttons.appendChild(rent);
+
+            {% endif %}
+
+            {% if (user.favStation is not null and user.favStation.id != station.id) or user.favStation is null %}
+            var fav = document.createElement("button");
+            fav.type = 'button';
+            fav.setAttribute('class', 'btn btn-secondary');
+            fav.textContent = "Definir comme favori";
+            fav.onclick = function() {(redirectTo("{{ url('app_add_fav', { 'id_station': station.id }) }}"))};
+            buttons.appendChild(fav);
+            {% endif %}
+
+            cardBody.appendChild(buttons);
+
+
+
+            popup.appendChild(cardBody);
+            marker.bindPopup(popup);
+
+
             {% endfor %}
 
         }

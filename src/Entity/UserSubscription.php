@@ -17,12 +17,12 @@ class UserSubscription
     private $id;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="datetime")
      */
     private $dateBeginning;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", inversedBy="userSubscription", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\User", inversedBy="userSubscription", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $User;

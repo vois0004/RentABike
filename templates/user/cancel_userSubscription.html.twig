@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <title>Abandonner abonnement</title>
+{% endblock %}
+
+
+{% block body %}
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Abonnement {{ subscription.subscription.type }} à {{ subscription.subscription.price }} €/mois </h5>
+                <p class="card-text">
+                <a class="card-link">Êtes vous sûr de vouloir annuler cet abonnement ? </a>
+                    <form action="{{ path('app_cancel_user_subscription') }}" method="post">
+                        <button class="btn btn-primary" type="submit">OUI</button><button  class="btn btn-primary" onclick="location.href='{{ path('app_home') }}'">NON</button>
+                    </form>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

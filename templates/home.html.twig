@@ -1,4 +1,7 @@
 {% extends 'base.html.twig' %}
+{% block title %}
+    Page d'acceuil
+{% endblock %}
 {% block body %}
 
             <div class="card">
@@ -32,9 +35,9 @@
                             </p>
                         {% else %}
                             <p class="card-text">Vous bénéficiez d'un abonnement {{ userSubscription.type }} pour {{ userSubscription.price }}€/mois.
-                                Il vous reste aujourd'hui {{ timeFree }}</p>
+                                Il vous reste aujourd'hui {{ timeFree }} minutes gratuites.</p>
                             <a href="{{ path('app_update_user_subscription') }}" class="card-link">Cliquez ici pour changer d'abonnement</a>
-                            <a href="#" class="card-link">Cliquez ici pour arrêter l'abonnement</a>
+                            <a href="{{ path('app_cancel_user_subscription') }}" class="card-link">Cliquez ici pour arrêter l'abonnement</a>
                         {% endif %}
                     </div>
                 </div>

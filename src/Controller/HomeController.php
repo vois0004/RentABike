@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class HomeController extends AbstractController
 {
     /**
-     * @Route("/home", name="app_home")
+     * @Route("/", name="app_home")
      */
     public function home()
     {
@@ -21,17 +21,22 @@ class HomeController extends AbstractController
         $ride =  $rideRepository->findOneBy(['User'=>$this->getUser(), 'stationEnd'=>null]);
 
 
-        if($userSubscription = $this->getUser()->getUserSubscription()!=null) {
+        $userSubscription = null;
+        if($this->getUser()->getUserSubscription()!=null) {
             $userSubscription = $this->getUser()->getUserSubscription()->getSubscription();
         }
 
         $timeFree = 0;
         if($userSubscription!=null) {
-            $timeFree = $userSubscription->getFreeTime();
+            $dateBeginSubscription = $this->getUser()->getUserSubscription()->getDateBeginning();
+                $timeFree = $userSubscription->getFreeTime();
+
             $rides = $rideRepository->findByUserAndToday($this->getUser());
             /** @var Ride $r */
             foreach ($rides as $r) {
-                $timeFree -= $r->getDateEnd()->diff($r->getDate())->i;
+                if( $dateBeginSubscription < $r->getDate() ) {
+                    $timeFree -= $r->getDateEnd()->diff($r->getDate())->i;
+                }
             }
         }
 

@@ -10,12 +10,12 @@
     </head>
     <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+        <nav class="navbar navbar-expand-lg navbar-light bg-primary-secondary">
             <a class="navbar-brand" href="{{ path('app_home') }}">Rent A Bike</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
@@ -29,15 +29,28 @@
                             <a class="dropdown-item" href="{{ path('app_user_subscription') }}">Abonnement</a>
                             <a class="dropdown-item" href="{{ path('app_list_ride') }}">Trajets</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="app_update_user">Modifier le compte</a>
-                            <a class="dropdown-item" href="app_disconnect">Se deconnecter</a>
+                            <a class="dropdown-item" href="{{ path('app_update_user') }}">Modifier le compte</a>
+                            <a class="dropdown-item" href="{{ path('app_logout') }}">Se deconnecter</a>
                         </div>
                     </li>
                 </ul>
             </div>
+            {% endif %}
         </nav>
     </header>
     <main>
+
+
+        {% for message in app.flashes('notice') %}
+            <div class="alert alert-secondary alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+
+        {% endfor %}
         {% block body %}{% endblock %}
     </main>
     {% block javascripts %}
